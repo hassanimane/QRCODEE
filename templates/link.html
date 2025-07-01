@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Share Upload Link</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="centerbox">
+        <h2>Guest Upload Link</h2>
+        <p style="word-break:break-all;"><b>URL:</b><br>
+            <a href="{{ upload_url }}" target="_blank">{{ upload_url }}</a>
+        </p>
+        <h3>QR Code:</h3>
+        <img src="{{ qr_code }}" width="250" height="250" alt="QR Code"><br>
+        <p>Share this link or QR code with guests.<br>
+        <a href="{{ upload_url }}" target="_blank"><button>Open Guest Upload Page</button></a></p>
+        <a href="{{ url_for('index') }}">Create another event</a>
+    </div>
+</body>
+</html>

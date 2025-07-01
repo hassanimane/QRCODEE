@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Event Album</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="centerbox">
+        <h2 style="text-align:center;">Create a New Event Album</h2>
+        <form method="POST" enctype="multipart/form-data">
+            <label>Event Name:<br>
+                <input type="text" name="event_name" required style="width:100%;"></label><br><br>
+            <label>Event Date:<br>
+                <input type="date" name="event_date" required style="width:100%;"></label><br><br>
+            <label>Event Message (for guests):<br>
+                <textarea name="event_message" required style="width:100%;height:3em;"></textarea></label><br><br>
+            <label>Background Image (JPG/PNG):<br>
+                <input type="file" name="event_bg" accept="image/*" required></label><br><br>
+            <button type="submit">Create & Get Upload Link</button>
+        </form>
+    </div>
+</body>
+</html>

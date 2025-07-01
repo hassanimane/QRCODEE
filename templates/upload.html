@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ event_name }} - Upload</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        {% if bg_url %}
+        body {
+            background: url('{{ bg_url }}') no-repeat center center fixed;
+            background-size: cover;
+        }
+        {% endif %}
+    </style>
+</head>
+<body>
+    <div class="centerbox" style="margin-top:10vh;">
+        <div class="event-title">{{ event_name }}</div>
+        <div class="event-date">{{ event_date }}</div>
+        <div class="event-message">{{ event_message }}</div>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, msg in messages %}
+                <div style="background:#e7f0fd; color:#1557a3; padding:0.7em 1em; border-radius:8px; margin-bottom:1em; text-align:center;">{{ msg }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+        <form method="POST" enctype="multipart/form-data" style="text-align:center;">
+            <label>Select photos or videos to upload (max 16MB each):<br>
+                <input type="file" name="media" multiple accept="image/*,video/*" required>
+            </label><br><br>
+            <button type="submit">Upload</button>
+        </form>
+    </div>
+</body>
+</html>
