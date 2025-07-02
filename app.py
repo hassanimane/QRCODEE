@@ -57,8 +57,10 @@ def index():
             f.write(f"{event_name}\n{event_date}\n{event_message}\n{bg_filename or ''}")
 
         # Generate upload link and QR code with the correct local IP
-        base_url = f'http://{get_local_ip()}:5000'
+        # new way (for Render/public hosting)
+        base_url = "https://qrcodee-1.onrender.com"
         upload_url = base_url + url_for('upload', event_id=event_id)
+
         qr = qrcode.make(upload_url)
         qr_path = os.path.join(event_folder, 'qr.png')
         qr.save(qr_path)
