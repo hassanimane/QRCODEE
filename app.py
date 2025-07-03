@@ -1,3 +1,20 @@
+import os
+import uuid
+import socket
+from flask import Flask, render_template, request, redirect, url_for, send_from_directory, flash
+from werkzeug.utils import secure_filename
+import qrcode
+
+app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = 'uploads'
+app.config['EVENT_BG_FOLDER'] = 'static/backgrounds'
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB
+app.secret_key = 'your_secret_key'
+
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'mp4', 'mov', 'avi', 'webm'}
+
+# (كل الدوال المساعدة مثل allowed_file... الخ)
+
 @app.route('/album/<event_id>/upload', methods=['GET', 'POST'])
 def upload(event_id):
     event_folder = os.path.join(app.config['UPLOAD_FOLDER'], event_id)
