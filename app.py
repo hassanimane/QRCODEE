@@ -1,9 +1,13 @@
 import os
 import uuid
-import socket
 from flask import Flask, render_template, request, redirect, url_for, send_from_directory, flash
 from werkzeug.utils import secure_filename
 import qrcode
+
+# Google Drive Imports
+from google.oauth2.credentials import Credentials
+from googleapiclient.discovery import build
+from googleapiclient.http import MediaFileUpload
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
@@ -19,6 +23,20 @@ os.makedirs(app.config['EVENT_BG_FOLDER'], exist_ok=True)
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+# === Google Drive Upload Function ===
+def upload_to_drive(event_id, file_path, filename):
+    token_path = os.path.join(app.config['UPLOAD_FOLDER'], event_id, 'token.json')
+    if not os.path.exists(token_path):
+        print("No Google Drive token found for this event.")
+        return False
+    creds = Credentials.from_authorized_user_file(token_path)
+    service = build('drive', 'v3', credentials=creds)
+    file_metadata = {'name': filename}
+    media = MediaFileUpload(file_path, resumable=True)
+    file = service.files().create(body=file_metadata, media_body=media, fields='id').execute()
+    print(f"Uploaded {filename} to Google Drive with file ID: {file.get('id')}")
+    return True
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -51,7 +69,7 @@ def index():
         qr_path = os.path.join(event_folder, 'qr.png')
         qr.save(qr_path)
 
-        return render_template('link.html', upload_url=upload_url, qr_code=url_for('qr_code', event_id=event_id))
+        return render_template('link.html', upload_url=upload_url, qr_code=url_for('qr_code', event_id=event_id), event_id=event_id)
     return render_template('index.html')
 
 @app.route('/uploads/<event_id>/qr.png')
@@ -85,6 +103,8 @@ def upload(event_id):
                 file.save(save_path)
                 file_exists = os.path.exists(save_path)
                 print(f"[UPLOAD DEBUG] File saved? {file_exists}")
+                # رفع مباشر إلى Google Drive
+                upload_to_drive(event_id, save_path, filename)
                 success = file_exists
         if success:
             flash("Your files have been uploaded! Thank you.", "success")
