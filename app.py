@@ -1,6 +1,6 @@
 import os
 import uuid
-from flask import Flask, render_template, request, redirect, url_for, send_from_directory, flash
+from flask import Flask, render_template, request, redirect, url_for, send_from_directory, flash, session
 from werkzeug.utils import secure_filename
 import qrcode
 
@@ -8,6 +8,7 @@ import qrcode
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
+from google_auth_oauthlib.flow import Flow
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
@@ -15,6 +16,7 @@ app.config['EVENT_BG_FOLDER'] = 'static/backgrounds'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB
 app.secret_key = 'your_secret_key'
 
+SCOPES = ['https://www.googleapis.com/auth/drive.file']
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'mp4', 'mov', 'avi', 'webm'}
 
 # Ensure necessary folders exist
@@ -38,6 +40,44 @@ def upload_to_drive(event_id, file_path, filename):
     print(f"Uploaded {filename} to Google Drive with file ID: {file.get('id')}")
     return True
 
+# ----------- Google Drive OAuth Routes -----------
+@app.route('/google-auth/<event_id>')
+def authorize_google(event_id):
+    flow = Flow.from_client_secrets_file(
+        'credentials.json',
+        scopes=SCOPES,
+        redirect_uri=url_for('oauth2callback', _external=True)
+    )
+    authorization_url, state = flow.authorization_url(
+        access_type='offline',
+        include_granted_scopes='true'
+    )
+    session['event_id'] = event_id
+    session['state'] = state
+    return redirect(authorization_url)
+
+@app.route('/oauth2callback')
+def oauth2callback():
+    state = session['state']
+    event_id = session['event_id']
+    flow = Flow.from_client_secrets_file(
+        'credentials.json',
+        scopes=SCOPES,
+        state=state,
+        redirect_uri=url_for('oauth2callback', _external=True)
+    )
+    flow.fetch_token(authorization_response=request.url)
+    credentials = flow.credentials
+    # Save the token in event folder
+    token_folder = os.path.join(app.config['UPLOAD_FOLDER'], event_id)
+    os.makedirs(token_folder, exist_ok=True)
+    token_path = os.path.join(token_folder, "token.json")
+    with open(token_path, "w") as token:
+        token.write(credentials.to_json())
+    flash("تم ربط Google Drive بنجاح لهذا الحدث!", "success")
+    return redirect(url_for('index'))
+
+# ----------- Main Routes -----------
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':

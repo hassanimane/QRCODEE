@@ -15,6 +15,19 @@
         <img src="{{ qr_code }}" width="250" height="250" alt="QR Code"><br>
         <p>Share this link or QR code with guests.<br>
         <a href="{{ upload_url }}" target="_blank"><button>Open Guest Upload Page</button></a></p>
+        
+        {% if event_id %}
+            <hr>
+            <a href="{{ url_for('authorize_google', event_id=event_id) }}">
+                <button style="background:#198754;color:#fff;padding:10px 25px;border-radius:12px;margin-top:20px;">
+                    ربط Google Drive للعرسان
+                </button>
+            </a>
+            <p style="font-size:13px;color:#666;margin-top:8px;">
+                يجب الضغط هنا وتوثيق الدخول بحساب Google Drive المطلوب لحفظ الصور.
+            </p>
+        {% endif %}
+
         <a href="{{ url_for('index') }}">Create another event</a>
     </div>
 </body>
