@@ -130,7 +130,7 @@ def authorize_google(event_id):
     flow = Flow.from_client_secrets_file(
         'credentials.json',
         scopes=SCOPES,
-        redirect_uri=url_for('oauth2callback', _external=True)
+        redirect_uri='https://qrcodee-1.onrender.com/oauth2callback'
     )
     authorization_url, state = flow.authorization_url(
         access_type='offline',
