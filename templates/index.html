@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Create Event Album</title>
+    <title>Create New Event Album</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
@@ -17,6 +17,8 @@
                 <textarea name="event_message" required style="width:100%;height:3em;"></textarea></label><br><br>
             <label>Background Image (JPG/PNG):<br>
                 <input type="file" name="event_bg" accept="image/*" required></label><br><br>
+            <label>Google Drive Email (for couple):<br>
+                <input type="email" name="drive_email" required style="width:100%;" placeholder="ex: couple@gmail.com"></label><br><br>
             <button type="submit">Create & Get Upload Link</button>
         </form>
     </div>
